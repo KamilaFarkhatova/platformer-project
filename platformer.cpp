@@ -8,6 +8,7 @@
 #include "assets.h"
 #include "utilities.h"
 #include "enemies_controller.h"
+#include "level_controller.h"
 
 void update_game() {
     game_frame++;
@@ -17,7 +18,7 @@ void update_game() {
             if (IsKeyPressed(KEY_ENTER)) {
                 SetExitKey(0);
                 game_state = GAME_STATE;
-                load_level(0);
+                LevelController::getInstanceLevel().load_level(0);
             }
             break;
 
@@ -31,7 +32,7 @@ void update_game() {
             }
 
             // Calculating collisions to decide whether the player is allowed to jump
-            is_player_on_ground = is_colliding({player_pos.x, player_pos.y + 0.1f}, WALL);
+        is_player_on_ground = LevelController::getInstanceLevel().is_colliding({player_pos.x, player_pos.y + 0.1f}, WALL);
             if ((IsKeyDown(KEY_UP) || IsKeyDown(KEY_W) || IsKeyDown(KEY_SPACE)) && is_player_on_ground) {
                 player_y_velocity = -JUMP_STRENGTH;
             }
@@ -55,7 +56,7 @@ void update_game() {
 
             if (IsKeyPressed(KEY_ENTER)) {
                 if (player_lives > 0) {
-                    load_level(0);
+                    LevelController::getInstanceLevel().load_level(0);
                     game_state = GAME_STATE;
                 }
                 else {
@@ -67,16 +68,16 @@ void update_game() {
 
         case GAME_OVER_STATE:
             if (IsKeyPressed(KEY_ENTER)) {
-                reset_level_index();
+                LevelController::getInstanceLevel().reset_level_index();
                 reset_player_stats();
                 game_state = GAME_STATE;
-                load_level(0);
+                LevelController::getInstanceLevel().load_level();
             }
             break;
 
         case VICTORY_STATE:
             if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE)) {
-                reset_level_index();
+                LevelController::getInstanceLevel().reset_level_index();
                 reset_player_stats();
                 game_state = MENU_STATE;
                 SetExitKey(KEY_ESCAPE);
@@ -129,7 +130,7 @@ int main() {
     load_fonts();
     load_images();
     load_sounds();
-    load_level();
+    LevelController::getInstanceLevel().load_level();
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -140,7 +141,7 @@ int main() {
         EndDrawing();
     }
 
-    unload_level();
+    LevelController::getInstanceLevel().unload_level();
     unload_sounds();
     unload_images();
     unload_fonts();

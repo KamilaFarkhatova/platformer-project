@@ -10,5 +10,9 @@ elseif(UNIX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -fsanitize=address -fsanitize=undefined")
 endif()
 
-add_executable(platformer platformer.cpp globals.h graphics.h level.cpp level.h player.cpp player.h enemies_controller.cpp enemies_controller.h enemy.h assets.h utilities.h)
+add_executable(platformer platformer.cpp
+        globals.h graphics.h assets.h utilities.h
+        level_controller.cpp level_controller.h level.h
+        player.cpp player.h
+        enemies_controller.cpp enemies_controller.h enemy.h)
 target_link_libraries(platformer PRIVATE raylib)
