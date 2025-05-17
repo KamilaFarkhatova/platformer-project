@@ -124,11 +124,11 @@ void update_player() {
     }
 
     // Upon colliding with an enemy...
-    if (is_colliding_with_enemies(player_pos)) {
+    if (EnemiesController::getInstance().is_colliding_with_enemies(player_pos)) {
         // ...check if their velocity is downwards...
         if (player_y_velocity > 0) {
             // ...if yes, award the player and kill the enemy
-            remove_colliding_enemy(player_pos);
+            EnemiesController::getInstance().remove_colliding_enemy(player_pos);
             PlaySound(kill_enemy_sound);
 
             increment_player_score();

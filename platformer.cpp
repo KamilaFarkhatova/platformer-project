@@ -7,6 +7,7 @@
 #include "graphics.h"
 #include "assets.h"
 #include "utilities.h"
+#include "enemies_controller.h"
 
 void update_game() {
     game_frame++;
@@ -36,7 +37,7 @@ void update_game() {
             }
 
             update_player();
-            update_enemies();
+            EnemiesController::getInstance().update_enemies();
 
             if (IsKeyPressed(KEY_ESCAPE)) {
                 game_state = PAUSED_STATE;
