@@ -4,6 +4,8 @@
 #include "raylib.h"
 #include "globals.h"
 #include "player.h"
+#include <fstream>
+#include <exception>
 
 bool LevelController::is_inside_level(int row, int column) {
     if (row < 0 || row >= LevelController::getInstanceLevel().get_current_level().get_rows()) return false;
@@ -147,4 +149,89 @@ char& Level::get_level_cell(size_t row, size_t column) {
 }
 void LevelController::set_current_level(const Level &current_level) {
     this->current_level = current_level;
+}
+
+Level LevelController::parseLevelRLE(const std::string& rleData) {
+    std::vector<std::string> rows;
+    std::string currentRow;
+    std::string counter;
+    for (size_t i = 0; i < rleData.length(); i++) {
+        char c = rleData[i];
+
+        if (c == '|') {
+            rows.push_back(currentRow);
+            currentRow.clear();
+            counter.clear();
+        } else if (c == ';') {
+            if (!currentRow.empty()) {
+                rows.push_back(currentRow);
+            }
+            break;
+        } else if (std::isdigit(c)) {
+             counter += c;
+        } else {
+            int count = 1;
+            if (!counter.empty()) {
+                try {
+                    count = std::stoi(counter);
+                } catch (const std::exception& e) {
+                    throw std::runtime_error("Invalid repeat count: " + counter);
+                }
+                counter.clear();
+            }
+            if (c != '#' && c != '=' && c != '-' && c != '@' &&
+                c != '*' && c != '^' && c != '&' && c != 'E') {
+                throw std::runtime_error("Invalid level character: " + std::string(1, c));
+            }
+
+            for (int j = 0; j < count; j++) {
+                currentRow += c;
+            }
+        }
+    }
+    if (!currentRow.empty()) {
+        rows.push_back(currentRow);
+    }
+
+    if (rows.empty()) {
+        throw std::runtime_error("No rows found in level data");
+    }
+    size_t rowLength = rows[0].length();
+    for (const auto& row : rows) {
+        if (row.length() != rowLength) {
+            throw std::runtime_error("Inconsistent row lengths in level data");
+        }
+    }
+    size_t rowCount = rows.size();
+    size_t colCount = rowLength;
+    char* levelData = new char[rowCount * colCount];
+
+    for (size_t r = 0; r < rowCount; r++) {
+        for (size_t c = 0; c < colCount; c++) {
+            levelData[r * colCount + c] = rows[r][c];
+        }
+    }
+    return {rowCount, colCount, levelData};
+}
+
+std::vector<Level> LevelController::loadLevelsFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        throw("Could not open file: " + filename);
+    }
+
+    std::string line;
+
+    while (std::getline(file, line)) {
+        if (line.empty() || line[0] == ';') {
+            continue;
+        }
+        LEVELS.push_back(parseLevelRLE(line));
+    }
+    if (LEVELS.empty()) {
+        throw("No valid levels found in file");
+    }
+
+    return LEVELS;
 }
