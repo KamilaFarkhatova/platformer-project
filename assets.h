@@ -34,9 +34,9 @@ void load_images() {
 
     enemy_walk                   = load_sprite("data/images/enemy_walk/enemy", ".png", 2, true, 15);
 
-    background                   = LoadTexture("data/images/background/background.png");
-    middleground                 = LoadTexture("data/images/background/middleground.png");
-    foreground                   = LoadTexture("data/images/background/foreground.png");
+    background                   = LoadTexture("data/images/background/house.png");
+    middleground                 = LoadTexture("data/images/background/trees.png");
+    foreground                   = LoadTexture("data/images/background/clouds.png");
 }
 
 void unload_images() {
