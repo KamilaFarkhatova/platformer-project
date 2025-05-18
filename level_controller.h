@@ -24,7 +24,7 @@ public:
     bool is_colliding(Vector2 pos, char look_for);
     char& get_collider(Vector2 pos, char look_for);
     static void reset_level_index();
-
+    void draw_level();
     void load_level(int offset = 0);
 
     static void unload_level();

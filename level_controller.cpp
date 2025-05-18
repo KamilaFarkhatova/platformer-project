@@ -1,9 +1,9 @@
 #include "level_controller.h"
-
 #include "enemies_controller.h"
 #include "level.h"
 #include "raylib.h"
 #include "globals.h"
+#include "player.h"
 
 bool LevelController::is_inside_level(int row, int column) {
     if (row < 0 || row >= LevelController::getInstanceLevel().get_current_level().get_rows()) return false;
@@ -81,7 +81,7 @@ void LevelController::load_level(int offset) {
     }
     LevelController::getInstanceLevel().set_current_level(Level{rows, columns, current_level_data});
     // Instantiate entities
-    spawn_player();
+    Player::getInstancePlayer().spawn_player();
     EnemiesController::getInstance().spawn_enemies();
 
     // Calculate positioning and sizes
@@ -94,7 +94,47 @@ void LevelController::load_level(int offset) {
 void LevelController::unload_level() {
     delete[] LevelController::getInstanceLevel().get_current_level_data();
 }
+void LevelController::draw_level() {
+    // Move the x-axis' center to the middle of the screen
+    horizontal_shift = (screen_size.x - cell_size) / 2;
 
+    for (size_t row = 0; row < LevelController::getInstanceLevel().get_current_level().get_rows(); ++row) {
+        for (size_t column = 0; column < LevelController::getInstanceLevel().get_current_level().get_columns(); ++column) {
+
+            Vector2 pos = {
+                // Move the level to the left as the player advances to the right,
+                // shifting to the left to allow the player to be centered later
+                (static_cast<float>(column) - Player::getInstancePlayer().get_player_posX()) * cell_size + horizontal_shift,
+                static_cast<float>(row) * cell_size
+        };
+
+            // Draw the level itself
+            char cell = Level::get_level_cell(row, column);
+            switch (cell) {
+                case WALL:
+                    draw_image(wall_image, pos, cell_size);
+                break;
+                case WALL_DARK:
+                    draw_image(wall_dark_image, pos, cell_size);
+                break;
+                case SPIKE:
+                    draw_image(spike_image, pos, cell_size);
+                break;
+                case COIN:
+                    draw_sprite(coin_sprite, pos, cell_size);
+                break;
+                case EXIT:
+                    draw_image(exit_image, pos, cell_size);
+                break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    Player::getInstancePlayer().draw_player();
+    EnemiesController::getInstance().draw_enemies();
+}
 // Getters and setters
 
 

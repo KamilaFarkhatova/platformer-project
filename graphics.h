@@ -3,6 +3,8 @@
 #include "level_controller.h"
 #include "globals.h"
 #include "enemies_controller.h"
+#include "player.h"
+#include "utilities.h"
 
 void draw_text(Text &text) {
     // Measure the text, center it to the required position, and draw it
@@ -39,7 +41,7 @@ void derive_graphics_metrics_from_loaded_level() {
 
 void draw_parallax_background() {
     // First uses the player's position
-    float initial_offset      = -(player_pos.x * PARALLAX_PLAYER_SCROLLING_SPEED + game_frame * PARALLAX_IDLE_SCROLLING_SPEED);
+    float initial_offset      = -(Player::getInstancePlayer().get_player_posX() * PARALLAX_PLAYER_SCROLLING_SPEED + game_frame * PARALLAX_IDLE_SCROLLING_SPEED);
 
     // Calculate offsets for different layers
     float background_offset   = initial_offset;
@@ -86,13 +88,13 @@ void draw_game_overlay() {
     DrawTextEx(menu_font, std::to_string(timer / 60).c_str(), timer_position, ICON_SIZE, 2.0f, WHITE);
 
     // Score
-    Vector2 score_dimensions = MeasureTextEx(menu_font, std::to_string(get_total_player_score()).c_str(), ICON_SIZE, 2.0f);
+    Vector2 score_dimensions = MeasureTextEx(menu_font, std::to_string(Player::getInstancePlayer().get_total_player_score()).c_str(), ICON_SIZE, 2.0f);
     Vector2 score_position = {GetRenderWidth() - score_dimensions.x - ICON_SIZE, slight_vertical_offset};
-    DrawTextEx(menu_font, std::to_string(get_total_player_score()).c_str(), score_position, ICON_SIZE, 2.0f, WHITE);
+    DrawTextEx(menu_font, std::to_string(Player::getInstancePlayer().get_total_player_score()).c_str(), score_position, ICON_SIZE, 2.0f, WHITE);
     draw_sprite(coin_sprite, {GetRenderWidth() - ICON_SIZE, slight_vertical_offset}, ICON_SIZE);
 }
 
-void draw_level() {
+/*void draw_level() {
     // Move the x-axis' center to the middle of the screen
     horizontal_shift = (screen_size.x - cell_size) / 2;
 
@@ -132,34 +134,34 @@ void draw_level() {
 
     draw_player();
     EnemiesController::getInstance().draw_enemies();
-}
+}*/
 
-void draw_player() {
+/*void draw_player() {
     horizontal_shift = (screen_size.x - cell_size) / 2;
 
     // Shift the camera to the center of the screen to allow to see what is in front of the player
     Vector2 pos = {
             horizontal_shift,
-            player_pos.y * cell_size
+            Player::getInstancePlayer().get_player_posY() * cell_size
     };
 
     // Pick an appropriate sprite for the player
     if (game_state == GAME_STATE) {
-        if (!is_player_on_ground) {
-            draw_image((is_looking_forward ? player_jump_forward_image : player_jump_backwards_image), pos, cell_size);
+        if (!Player::getInstancePlayer().is_player_on_ground()) {
+            draw_image((Player::getInstancePlayer().is_looking_forward() ? player_jump_forward_image : player_jump_backwards_image), pos, cell_size);
         }
-        else if (is_moving) {
-            draw_sprite((is_looking_forward ? player_walk_forward_sprite : player_walk_backwards_sprite), pos, cell_size);
-            is_moving = false;
+        else if (Player::getInstancePlayer().is_moving()) {
+            draw_sprite((Player::getInstancePlayer().is_looking_forward() ? player_walk_forward_sprite : player_walk_backwards_sprite), pos, cell_size);
+            Player::getInstancePlayer().set_is_moving(false);
         }
         else {
-            draw_image((is_looking_forward ? player_stand_forward_image : player_stand_backwards_image), pos, cell_size);
+            draw_image((Player::getInstancePlayer().is_looking_forward() ? player_stand_forward_image : player_stand_backwards_image), pos, cell_size);
         }
     }
     else {
         draw_image(player_dead_image, pos, cell_size);
     }
-}
+}*/
 
 /*void draw_enemies() {
     // Go over all enemies and draw them, once again accounting to the player's movement and horizontal shift
@@ -187,7 +189,7 @@ void draw_pause_menu() {
 
 void draw_death_screen() {
     draw_parallax_background();
-    draw_level();
+    LevelController::getInstanceLevel().draw_level();
     draw_game_overlay();
     DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), {0, 0, 0, 100});
     draw_text(death_title);
