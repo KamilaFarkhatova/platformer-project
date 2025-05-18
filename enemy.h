@@ -1,5 +1,6 @@
 #ifndef ENEMY_H
 #define ENEMY_H
+
 class Enemy {
 public:
     Enemy(const Vector2 &pos, const bool looking_right)

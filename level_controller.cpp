@@ -7,13 +7,15 @@
 #include <fstream>
 #include <exception>
 
-bool LevelController::is_inside_level(int row, int column) {
+bool LevelController::is_inside_level(int row, int column)
+{
     if (row < 0 || row >= LevelController::getInstanceLevel().get_current_level().get_rows()) return false;
     if (column < 0 || column >= LevelController::getInstanceLevel().get_current_level().get_columns()) return false;
     return true;
 }
 
-bool LevelController::is_colliding(Vector2 pos, char look_for) {
+bool LevelController::is_colliding(Vector2 pos, char look_for)
+{
     Rectangle entity_hitbox = {pos.x, pos.y, 1.0f, 1.0f};
 
     // Scan the adjacent area in the level to look for a match in collision
@@ -72,8 +74,6 @@ void LevelController::load_level(int offset) {
     size_t rows = LEVELS[level_index].get_rows();
     size_t columns = LEVELS[level_index].get_columns();
     current_level_data = new char[rows * columns];
-
-
 
     for (int row = 0; row < rows; row++) {
         for (int column = 0; column < columns; column++) {
@@ -139,8 +139,6 @@ void LevelController::draw_level() {
 }
 // Getters and setters
 
-
-
 void LevelController::set_level_cell(size_t row,size_t column, char chr) {
     Level::get_level_cell(row, column) = chr;
 }
@@ -155,6 +153,7 @@ Level LevelController::parseLevelRLE(const std::string& rleData) {
     std::vector<std::string> rows;
     std::string currentRow;
     std::string counter;
+
     for (size_t i = 0; i < rleData.length(); i++) {
         char c = rleData[i];
 
@@ -202,6 +201,7 @@ Level LevelController::parseLevelRLE(const std::string& rleData) {
             throw std::runtime_error("Inconsistent row lengths in level data");
         }
     }
+
     size_t rowCount = rows.size();
     size_t colCount = rowLength;
     char* levelData = new char[rowCount * colCount];

@@ -4,25 +4,31 @@
 #include "globals.h"
 #include "level.h"
 #include "level_controller.h"
+
 class Player {
 public:
     static Player &getInstancePlayer() {
         static Player instance;
         return instance;
     };
+
     Player(const Player&) = delete;
     Player operator=(const Player&) = delete;
     Player(Player&&) = delete;
     Player operator=(Player&&) = delete;
+
     [[nodiscard]] Vector2 get_player_pos() {
         return player_pos;
     }
+
     [[nodiscard]] float get_player_posX() {
         return player_pos.x;
     }
+
     [[nodiscard]] float get_player_posY() {
         return player_pos.y;
     }
+
     void set_player_posX(const float x) {
         this->player_pos.x = x;
     }
@@ -64,6 +70,7 @@ public:
     void draw_player();
     void update_player_gravity();
     void update_player();
+
 private:
     Player() = default;
     ~Player() = default;

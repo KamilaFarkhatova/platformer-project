@@ -68,6 +68,7 @@ void EnemiesController::remove_colliding_enemy(const Vector2 pos) {
         }
     }
 }
+
     void EnemiesController::draw_enemies(){
         // Go over all enemies and draw them, once again accounting to the player's movement and horizontal shift
         for (auto &enemy : EnemiesController::getInstance().get_enemies()) {

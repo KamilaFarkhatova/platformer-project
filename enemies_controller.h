@@ -15,10 +15,12 @@ public:
         static EnemiesController instance;
         return instance;
     };
+
     EnemiesController(const EnemiesController&) = delete;
     EnemiesController operator=(const EnemiesController&) = delete;
     EnemiesController(EnemiesController&&) = delete;
     EnemiesController operator=(EnemiesController&&) = delete;
+
     void spawn_enemies();
     void update_enemies();
     bool is_colliding_with_enemies(Vector2 pos) const;
@@ -29,7 +31,8 @@ public:
 private:
     EnemiesController() = default;
     ~EnemiesController() = default;
+
     std::vector<Enemy> enemies{};
-    };
+};
 
 #endif //ENEMIES_CONTROLLER_H

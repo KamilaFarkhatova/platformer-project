@@ -1,5 +1,6 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
+
 #include "level_controller.h"
 #include "globals.h"
 #include "enemies_controller.h"
@@ -30,8 +31,7 @@ void derive_graphics_metrics_from_loaded_level() {
 
     if (screen_size.x > screen_size.y) {
         background_size = {larger_screen_side, larger_screen_side / 16 * 10};
-    }
-    else {
+    } else {
         background_size = {larger_screen_side / 10 * 16, larger_screen_side};
     }
 
@@ -92,89 +92,6 @@ void draw_game_overlay() {
     DrawTextEx(menu_font, std::to_string(Player::getInstancePlayer().get_total_player_score()).c_str(), score_position, ICON_SIZE, 2.0f, WHITE);
     draw_sprite(coin_sprite, {GetRenderWidth() - ICON_SIZE, slight_vertical_offset}, ICON_SIZE);
 }
-
-/*void draw_level() {
-    // Move the x-axis' center to the middle of the screen
-    horizontal_shift = (screen_size.x - cell_size) / 2;
-
-    for (size_t row = 0; row < LevelController::getInstanceLevel().get_current_level().get_rows(); ++row) {
-        for (size_t column = 0; column < LevelController::getInstanceLevel().get_current_level().get_columns(); ++column) {
-
-            Vector2 pos = {
-                    // Move the level to the left as the player advances to the right,
-                    // shifting to the left to allow the player to be centered later
-                    (static_cast<float>(column) - player_pos.x) * cell_size + horizontal_shift,
-                    static_cast<float>(row) * cell_size
-            };
-
-            // Draw the level itself
-            char cell = Level::get_level_cell(row, column);
-            switch (cell) {
-                case WALL:
-                    draw_image(wall_image, pos, cell_size);
-                    break;
-                case WALL_DARK:
-                    draw_image(wall_dark_image, pos, cell_size);
-                    break;
-                case SPIKE:
-                    draw_image(spike_image, pos, cell_size);
-                    break;
-                case COIN:
-                    draw_sprite(coin_sprite, pos, cell_size);
-                    break;
-                case EXIT:
-                    draw_image(exit_image, pos, cell_size);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    draw_player();
-    EnemiesController::getInstance().draw_enemies();
-}*/
-
-/*void draw_player() {
-    horizontal_shift = (screen_size.x - cell_size) / 2;
-
-    // Shift the camera to the center of the screen to allow to see what is in front of the player
-    Vector2 pos = {
-            horizontal_shift,
-            Player::getInstancePlayer().get_player_posY() * cell_size
-    };
-
-    // Pick an appropriate sprite for the player
-    if (game_state == GAME_STATE) {
-        if (!Player::getInstancePlayer().is_player_on_ground()) {
-            draw_image((Player::getInstancePlayer().is_looking_forward() ? player_jump_forward_image : player_jump_backwards_image), pos, cell_size);
-        }
-        else if (Player::getInstancePlayer().is_moving()) {
-            draw_sprite((Player::getInstancePlayer().is_looking_forward() ? player_walk_forward_sprite : player_walk_backwards_sprite), pos, cell_size);
-            Player::getInstancePlayer().set_is_moving(false);
-        }
-        else {
-            draw_image((Player::getInstancePlayer().is_looking_forward() ? player_stand_forward_image : player_stand_backwards_image), pos, cell_size);
-        }
-    }
-    else {
-        draw_image(player_dead_image, pos, cell_size);
-    }
-}*/
-
-/*void draw_enemies() {
-    // Go over all enemies and draw them, once again accounting to the player's movement and horizontal shift
-    for (auto &enemy : EnemiesController::getInstance().get_enemies()) {
-        horizontal_shift = (screen_size.x - cell_size) / 2;
-
-        Vector2 pos = {
-                (enemy.get_pos().x - player_pos.x) * cell_size + horizontal_shift,
-                enemy.get_pos().y * cell_size
-        };
-
-        draw_sprite(enemy_walk, pos, cell_size);
-    }
-}*/
 
 // Menus
 void draw_menu() {

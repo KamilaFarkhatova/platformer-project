@@ -4,9 +4,9 @@
 #include "level.h"
 #include "level_controller.h"
 
-#include "player.h"
 void Player::reset_player_stats() {
     player_lives = MAX_PLAYER_LIVES;
+
     for (int i = 0; i < LEVEL_COUNT; i++) {
         player_level_scores[i] = 0;
     }
@@ -58,8 +58,7 @@ void Player::move_player_horizontally(float delta) {
     float next_x = Player::getInstancePlayer().get_player_posX() + delta;
     if (!LevelController::getInstanceLevel().is_colliding({next_x, Player::getInstancePlayer().get_player_posY()}, WALL)) {
         Player::getInstancePlayer().set_player_posX(next_x);
-    }
-    else {
+    } else {
         player_pos.x = roundf(player_pos.x);
         return;
     }
@@ -79,7 +78,6 @@ void Player::update_player_gravity() {
 
     player_pos.y += player_y_velocity;
     player_y_velocity += GRAVITY_FORCE;
-
 
     // If the player is on ground, zero player's y-velocity
     // If the player is *in* ground, pull them out by rounding their position
@@ -110,14 +108,12 @@ void Player::update_player() {
                 increment_player_score();
                 time_to_coin_counter = 0;
             }
-        }
-        else {
+        } else {
             // Allow the player to exit after the level timer goes to zero
             LevelController::getInstanceLevel().load_level(1);
             PlaySound(exit_sound);
         }
-    }
-    else {
+    } else {
         // Decrement the level timer if not at an exit
         if (timer >= 0) timer--;
     }
@@ -137,8 +133,7 @@ void Player::update_player() {
 
             increment_player_score();
             player_y_velocity = -BOUNCE_OFF_ENEMY;
-        }
-        else {
+        } else {
             // ...if not, kill the player
             Player::getInstancePlayer().kill_player();
         }
@@ -158,16 +153,13 @@ void Player::draw_player() {
     if (game_state == GAME_STATE) {
         if (!(Player::getInstancePlayer().is_player_on_ground())) {
             draw_image((Player::getInstancePlayer().is_looking_forward() ? player_jump_forward_image : player_jump_backwards_image), pos, cell_size);
-        }
-        else if (Player::getInstancePlayer().is_moving()) {
+        } else if (Player::getInstancePlayer().is_moving()) {
             draw_sprite((Player::getInstancePlayer().is_looking_forward() ? player_walk_forward_sprite : player_walk_backwards_sprite), pos, cell_size);
             Player::getInstancePlayer().set_is_moving(false);
-        }
-        else {
+        } else {
             draw_image((Player::getInstancePlayer().is_looking_forward() ? player_stand_forward_image : player_stand_backwards_image), pos, cell_size);
         }
-    }
-    else {
+    } else {
         draw_image(player_dead_image, pos, cell_size);
     }
 }
