@@ -171,6 +171,8 @@ inline Texture2D foreground;
 
 /* Sounds */
 
+inline Music music;
+
 inline Sound coin_sound;
 inline Sound exit_sound;
 inline Sound player_death_sound;

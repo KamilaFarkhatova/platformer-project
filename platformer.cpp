@@ -137,6 +137,8 @@ int main() {
     while (!WindowShouldClose()) {
         BeginDrawing();
 
+        UpdateMusicStream(music);
+
         update_game();
         draw_game();
 
@@ -147,6 +149,8 @@ int main() {
     unload_sounds();
     unload_images();
     unload_fonts();
+
+    UnloadMusicStream(music);
 
     CloseAudioDevice();
     CloseWindow();
