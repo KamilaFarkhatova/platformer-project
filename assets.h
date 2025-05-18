@@ -16,9 +16,9 @@ void unload_fonts() {
 }
 
 void load_images() {
-    wall_image                   = LoadTexture("data/images/wall.png");
-    wall_dark_image              = LoadTexture("data/images/wall_dark.png");
-    spike_image                  = LoadTexture("data/images/spikes.png");
+    wall_image                   = LoadTexture("data/images/wall_dark.png");
+    wall_dark_image              = LoadTexture("data/images/swamp.png");
+    spike_image                  = LoadTexture("data/images/tina.png");
     exit_image                   = LoadTexture("data/images/exit.png");
 
     coin_sprite                  = load_sprite("data/images/ruby/ruby", ".png", 3, true, 18);
