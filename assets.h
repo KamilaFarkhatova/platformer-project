@@ -21,7 +21,7 @@ void load_images() {
     spike_image                  = LoadTexture("data/images/spikes.png");
     exit_image                   = LoadTexture("data/images/exit.png");
 
-    coin_sprite                  = load_sprite("data/images/coin/coin", ".png", 3, true, 18);
+    coin_sprite                  = load_sprite("data/images/ruby/ruby", ".png", 3, true, 18);
     heart_image                  = LoadTexture("data/images/heart.png");
 
     player_stand_forward_image   = LoadTexture("data/images/player_stand_forward.png");
