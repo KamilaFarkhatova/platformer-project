@@ -7,6 +7,14 @@
 #include <fstream>
 #include <exception>
 
+// Singleton accessor
+LevelController& LevelController::getInstanceLevel()
+{
+    static LevelController instance;
+    return instance;
+}
+
+// Boundary checking
 bool LevelController::is_inside_level(int row, int column)
 {
     if (row < 0 || row >= LevelController::getInstanceLevel().get_current_level().get_rows()) return false;
@@ -14,6 +22,7 @@ bool LevelController::is_inside_level(int row, int column)
     return true;
 }
 
+// Collision detection
 bool LevelController::is_colliding(Vector2 pos, char look_for)
 {
     Rectangle entity_hitbox = {pos.x, pos.y, 1.0f, 1.0f};
@@ -34,6 +43,7 @@ bool LevelController::is_colliding(Vector2 pos, char look_for)
     return false;
 }
 
+// Retrieve reference to colliding cell
 char& LevelController::get_collider(Vector2 pos, char look_for) {
     // Like is_colliding(), except returns a reference to the colliding object
     Rectangle player_hitbox = {pos.x, pos.y, 1.0f, 1.0f};
@@ -55,11 +65,13 @@ char& LevelController::get_collider(Vector2 pos, char look_for) {
     return Level::get_level_cell(pos.x, pos.y);
 }
 
-void LevelController::reset_level_index() {
+void LevelController::reset_level_index()
+{
     level_index = 0;
 }
 
-void LevelController::load_level(int offset) {
+void LevelController::load_level(int offset)
+{
     level_index += offset;
 
     // Win logic
@@ -77,11 +89,12 @@ void LevelController::load_level(int offset) {
 
     for (int row = 0; row < rows; row++) {
         for (int column = 0; column < columns; column++) {
-            const char* source_data = LEVELS[level_index].get_data(); // Use the getter
+            const char* source_data = LEVELS[level_index].get_data();
             current_level_data[row * columns + column] = source_data[row * columns + column];
         }
     }
     LevelController::getInstanceLevel().set_current_level(Level{rows, columns, current_level_data});
+
     // Instantiate entities
     Player::getInstancePlayer().spawn_player();
     EnemiesController::getInstance().spawn_enemies();
@@ -93,10 +106,12 @@ void LevelController::load_level(int offset) {
     timer = MAX_LEVEL_TIME;
 }
 
-void LevelController::unload_level() {
+void LevelController::unload_level()
+{
     delete[] LevelController::getInstanceLevel().get_current_level_data();
 }
-void LevelController::draw_level() {
+void LevelController::draw_level()
+{
     // Move the x-axis' center to the middle of the screen
     horizontal_shift = (screen_size.x - cell_size) / 2;
 
@@ -113,23 +128,12 @@ void LevelController::draw_level() {
             // Draw the level itself
             char cell = Level::get_level_cell(row, column);
             switch (cell) {
-                case WALL:
-                    draw_image(wall_image, pos, cell_size);
-                break;
-                case WALL_DARK:
-                    draw_image(wall_dark_image, pos, cell_size);
-                break;
-                case SPIKE:
-                    draw_image(spike_image, pos, cell_size);
-                break;
-                case COIN:
-                    draw_sprite(coin_sprite, pos, cell_size);
-                break;
-                case EXIT:
-                    draw_image(exit_image, pos, cell_size);
-                break;
-                default:
-                    break;
+                case WALL:draw_image(wall_image, pos, cell_size); break;
+                case WALL_DARK:draw_image(wall_dark_image, pos, cell_size); break;
+                case SPIKE:draw_image(spike_image, pos, cell_size); break;
+                case COIN:draw_sprite(coin_sprite, pos, cell_size); break;
+                case EXIT:draw_image(exit_image, pos, cell_size); break;
+                default: break;
             }
         }
     }
@@ -138,100 +142,85 @@ void LevelController::draw_level() {
     EnemiesController::getInstance().draw_enemies();
 }
 // Getters and setters
+char& Level::get_level_cell(size_t row, size_t column) {
+    return LevelController::getInstanceLevel().get_current_level().data[row * LevelController::getInstanceLevel().get_current_level().get_columns() + column];
+}
 
 void LevelController::set_level_cell(size_t row,size_t column, char chr) {
     Level::get_level_cell(row, column) = chr;
 }
-char& Level::get_level_cell(size_t row, size_t column) {
-    return LevelController::getInstanceLevel().get_current_level().data[row * LevelController::getInstanceLevel().get_current_level().get_columns() + column];
-}
+
 void LevelController::set_current_level(const Level &current_level) {
     this->current_level = current_level;
 }
 
-Level LevelController::parseLevelRLE(const std::string& rleData) {
-    std::vector<std::string> rows;
-    std::string currentRow;
-    std::string counter;
-
-    for (size_t i = 0; i < rleData.length(); i++) {
-        char c = rleData[i];
-
-        if (c == '|') {
-            rows.push_back(currentRow);
-            currentRow.clear();
-            counter.clear();
-        } else if (c == ';') {
-            if (!currentRow.empty()) {
-                rows.push_back(currentRow);
-            }
-            break;
-        } else if (std::isdigit(c)) {
-             counter += c;
-        } else {
-            int count = 1;
-            if (!counter.empty()) {
-                try {
-                    count = std::stoi(counter);
-                } catch (const std::exception& e) {
-                    throw std::runtime_error("Invalid repeat count: " + counter);
-                }
-                counter.clear();
-            }
-            if (c != '#' && c != '=' && c != '-' && c != '@' &&
-                c != '*' && c != '^' && c != '&' && c != 'E') {
-                throw std::runtime_error("Invalid level character: " + std::string(1, c));
-            }
-
-            for (int j = 0; j < count; j++) {
-                currentRow += c;
-            }
-        }
-    }
-    if (!currentRow.empty()) {
-        rows.push_back(currentRow);
-    }
-
-    if (rows.empty()) {
-        throw std::runtime_error("No rows found in level data");
-    }
-    size_t rowLength = rows[0].length();
-    for (const auto& row : rows) {
-        if (row.length() != rowLength) {
-            throw std::runtime_error("Inconsistent row lengths in level data");
-        }
-    }
-
-    size_t rowCount = rows.size();
-    size_t colCount = rowLength;
-    char* levelData = new char[rowCount * colCount];
-
-    for (size_t r = 0; r < rowCount; r++) {
-        for (size_t c = 0; c < colCount; c++) {
-            levelData[r * colCount + c] = rows[r][c];
-        }
-    }
-    return {rowCount, colCount, levelData};
-}
-
 std::vector<Level> LevelController::loadLevelsFromFile(const std::string& filename) {
     std::ifstream file(filename);
-
-    if (!file.is_open()) {
-        throw("Could not open file: " + filename);
-    }
+    if (!file.is_open()) throw("Could not open file: " + filename);
 
     std::string line;
-
     while (std::getline(file, line)) {
-        if (line.empty() || line[0] == ';') {
-            continue;
+        if (!line.empty() && line[0] != ';') {
+            LEVELS.push_back(parseLevelRLE(line));
         }
-        LEVELS.push_back(parseLevelRLE(line));
-    }
-    if (LEVELS.empty()) {
-        throw("No valid levels found in file");
     }
 
+    if (LEVELS.empty()) throw("No valid levels found in file");
     return LEVELS;
+}
+
+Level LevelController::parseLevelRLE(const std::string& rleData) {
+    std::vector<std::string> rows;
+    std::string rowBuf, countBuf;
+
+    for (char c : rleData) {
+        if (c == '|') {
+            rows.push_back(rowBuf);
+            rowBuf.clear();
+            countBuf.clear();
+        } else if (c == ';') {
+            if (!rowBuf.empty()) rows.push_back(rowBuf);
+            break;
+        } else if (isdigit(c)) {
+            countBuf += c;
+        } else {
+            int count = countBuf.empty() ? 1 : std::stoi(countBuf);
+            countBuf.clear();
+
+            if (std::string("#=-@*^&E").find(c) == std::string::npos)
+                throw std::runtime_error("Invalid character: " + std::string(1, c));
+
+            rowBuf.append(count, c);
+        }
+    }
+
+    if (!rowBuf.empty()) rows.push_back(rowBuf);
+    if (rows.empty()) throw std::runtime_error("No rows parsed");
+
+    size_t width = rows[0].size();
+    for (const auto& r : rows) {
+        if (r.size() != width) throw std::runtime_error("Row size mismatch");
+    }
+
+    size_t height = rows.size();
+    char* data = new char[height * width];
+    for (size_t r = 0; r < height; ++r)
+        for (size_t c = 0; c < width; ++c)
+            data[r * width + c] = rows[r][c];
+
+    return { height, width, data };
+}
+
+
+
+std::vector<Level> LevelController::get_levels() const {
+    return LEVELS;
+}
+
+Level& LevelController::get_current_level() {
+    return current_level;
+}
+
+char* LevelController::get_current_level_data() const {
+    return current_level_data;
 }

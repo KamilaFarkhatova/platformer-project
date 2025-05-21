@@ -124,7 +124,7 @@ void draw_game() {
 
 int main() {
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(1024, 480, "Platformer");
+    InitWindow(2048, 1024, "Platformer");
     SetTargetFPS(60);
     HideCursor();
 
